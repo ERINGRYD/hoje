@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { StudyPlan } from '@/types/study';
+import { exportStudyPlan, importStudyPlan, createBackup } from '@/utils/sqlitePersistence';
 
 interface StudyPlanManagerProps {
   currentPlan: StudyPlan | null;
@@ -94,7 +95,7 @@ const StudyPlanManager: React.FC<StudyPlanManagerProps> = ({
 
   const handleDeletePlan = (planId: string, planName: string) => {
     if (window.confirm(`Tem certeza que deseja excluir o plano "${planName}"?`)) {
-      if (deleteStudyPlan(planId)) {
+      if (deletePlan(planId)) {
         toast({
           title: "Sucesso",
           description: `Plano "${planName}" excluído com sucesso!`
