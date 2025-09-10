@@ -45,12 +45,11 @@ export const StudyProvider: React.FC<StudyProviderProps> = ({ children }) => {
 
   // Use the global database context with error handling
   const dbContext = useDB();
-  const { db, isLoading: isDBLoading, error: dbError } = dbContext || { 
-    db: null, 
-    isLoading: true, 
-    error: null 
-  };
+  if (!dbContext) {
+    throw new Error('StudyProvider must be wrapped by DBProvider');
+  }
   
+  const { db, isLoading: isDBLoading, error: dbError } = dbContext;
   const isInitialized = !!db && !isDBLoading;
 
   // Initialize app data after database is ready
