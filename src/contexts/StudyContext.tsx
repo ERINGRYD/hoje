@@ -61,6 +61,10 @@ export const StudyProvider: React.FC<StudyProviderProps> = ({ children }) => {
       try {
         await migrateFromLocalStorage();
         
+        // Ensure active plan stability - run migration
+        const { ensureActiveStudyPlan } = await import('@/utils/studyDataMigration');
+        ensureActiveStudyPlan();
+        
         const savedPlan = loadActiveStudyPlan();
         if (savedPlan) {
           const planWithDefaults = savedPlan.cycleStart
@@ -70,6 +74,7 @@ export const StudyProvider: React.FC<StudyProviderProps> = ({ children }) => {
           if (planWithDefaults.examDate) {
             setExamDate(new Date(planWithDefaults.examDate));
           }
+          console.log('✅ Plano ativo restaurado:', savedPlan.id);
         }
 
         // Load existing study sessions from database

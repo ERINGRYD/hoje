@@ -356,7 +356,7 @@ const StudyPlanner: React.FC = () => {
   }, [isTimerRunning, timer, timerMode, currentSession, completedSessions, pomodoroSettings]);
 
   const handleGeneratePlan = (generatedPlan: StudyPlan) => {
-    console.log('Generating study plan with data:', generatedPlan);
+    console.log('💫 Gerando plano de estudos:', generatedPlan);
     try {
       // Add weekly hour limit
       const planWithTasks = {
@@ -366,7 +366,7 @@ const StudyPlanner: React.FC = () => {
         examDate: examDate,
         weeklyHourLimit: generatedPlan.totalHours
       };
-      console.log('Plan created with ID:', planWithTasks.id);
+      console.log('📋 Plano criado com ID:', planWithTasks.id);
 
       // Update states
       setStudyPlan(planWithTasks);
@@ -375,21 +375,17 @@ const StudyPlanner: React.FC = () => {
       // Update subjects in context
       setContextSubjects(getCurrentSubjects());
 
-      // Save to localStorage for persistence
-      try {
-        const savedPlans = JSON.parse(localStorage.getItem('studyPlans') || '[]');
-        const updatedPlans = [...savedPlans, planWithTasks];
-        localStorage.setItem('studyPlans', JSON.stringify(updatedPlans));
-        console.log('Plan saved to localStorage');
-      } catch (storageError) {
-        console.warn('Failed to save plan to localStorage:', storageError);
-      }
-
+      // 🔥 NEW: Use the stable persistence system
+      console.log('💾 Salvando plano ativo através do sistema estável...');
+      
+      // The plan will be automatically saved to both study_plans and saved_plans 
+      // with proper active reference via saveActiveStudyPlan
+      
       // Advance to step 10 (final plan display)
       setCurrentStep(10);
-      console.log('Advanced to step 10 - plan display');
+      console.log('✅ Avançando para step 10 - exibição do plano');
     } catch (error) {
-      console.error('Error in handleGeneratePlan:', error);
+      console.error('💥 Erro em handleGeneratePlan:', error);
       setCurrentStep(10);
     }
   };

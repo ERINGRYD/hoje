@@ -39,18 +39,90 @@ import {
   calculateDailyMetrics
 } from '@/db/crud';
 import { withDatabase, safeDatabaseOperation } from '@/utils/databaseUtils';
+import { studyDB } from '@/lib/studyDatabase';
 
 // Active study plan operations with safe database access
 export const saveActiveStudyPlan = (plan: StudyPlan): void => {
   safeDatabaseOperation(() => {
-    dbSaveStudyPlan(plan);
+    console.log('💾 Salvando plano ativo:', plan.id || 'sem-id');
+    
+    // Use stable ID for active plan
+    const activeId = plan.id || 'active_plan';
+    const planWithId = { ...plan, id: activeId };
+    
+    // Save to study_plans table
+    dbSaveStudyPlan(planWithId);
+    
+    // Ensure there's always a stable "Plano Atual" entry in saved_plans
+    try {
+      const db = studyDB.getDB();
+      
+      // Mark all other plans as inactive
+      db.run('UPDATE saved_plans SET is_active = FALSE');
+      
+      // Create or update the active plan entry
+      db.run(`
+        INSERT OR REPLACE INTO saved_plans (id, name, plan_id, is_active)
+        VALUES (?, ?, ?, TRUE)
+      `, [activeId, 'Plano Atual', activeId]);
+      
+      // Save active plan ID to app settings for extra reliability
+      saveTypedSetting('active_plan_id', activeId, 'general', 'ID do plano de estudos ativo');
+      
+      console.log('✅ Plano ativo salvo com sucesso:', activeId);
+    } catch (error) {
+      console.error('❌ Erro ao salvar referência do plano ativo:', error);
+      throw error;
+    }
   });
 };
 
 export const loadActiveStudyPlan = (): StudyPlan | null => {
   return withDatabase(() => {
-    const activePlan = dbGetActivePlan();
-    return activePlan?.plan || null;
+    console.log('📖 Carregando plano ativo...');
+    
+    try {
+      // Priority 1: Load from app_settings active_plan_id
+      const activePlanId = loadTypedSetting<string>('active_plan_id', '');
+      if (activePlanId) {
+        console.log('🎯 Tentando carregar pela configuração:', activePlanId);
+        const plan = dbLoadStudyPlan(activePlanId);
+        if (plan) {
+          console.log('✅ Plano carregado via configuração:', plan.id);
+          return plan;
+        }
+      }
+
+      // Priority 2: Load from saved_plans with is_active = TRUE
+      const activePlan = dbGetActivePlan();
+      if (activePlan?.plan) {
+        console.log('✅ Plano carregado via saved_plans:', activePlan.plan.id);
+        return activePlan.plan;
+      }
+
+      // Priority 3: Fallback to most recent study_plans entry
+      const db = studyDB.getDB();
+      const stmt = db.prepare('SELECT * FROM study_plans ORDER BY created_at DESC LIMIT 1');
+      const result = stmt.getAsObject();
+      stmt.free();
+
+      if (result.id) {
+        console.log('🔄 Usando fallback - plano mais recente:', result.id);
+        const plan = dbLoadStudyPlan(result.id as string);
+        if (plan) {
+          // Auto-repair: make this the active plan
+          saveActiveStudyPlan(plan);
+          console.log('✅ Plano restaurado e marcado como ativo:', plan.id);
+          return plan;
+        }
+      }
+
+      console.log('⚠️ Nenhum plano ativo encontrado');
+      return null;
+    } catch (error) {
+      console.error('❌ Erro ao carregar plano ativo:', error);
+      return null;
+    }
   }, null);
 };
 
