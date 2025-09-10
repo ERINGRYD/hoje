@@ -146,12 +146,12 @@ export const transformDataToDexie = (sqliteData: SQLiteData) => {
             createdAt: new Date().toISOString()
           })) || [],
       completed: false,
-      createdAt: plan.createdAt || new Date().toISOString()
+      createdAt: new Date().toISOString()
     })) || [];
 
     return {
       title: `Plano de Estudos ${index + 1}`,
-      description: `Plano criado em ${new Date(plan.createdAt || Date.now()).toLocaleDateString()}`,
+      description: `Plano criado em ${new Date().toLocaleDateString()}`,
       status: 'active' as const,
       stages,
       isActive: index === 0, // First plan is active
@@ -161,19 +161,31 @@ export const transformDataToDexie = (sqliteData: SQLiteData) => {
   });
 
   // Transform Tasks from study sessions
-  const tasks: Omit<Task, 'id'>[] = sqliteData.studySessions.map((session, index) => ({
-    stageId: `stage-0-0`, // Default to first stage
-    journeyId: '1', // Default to first journey
-    title: `Sessão de Estudo ${index + 1}`,
-    description: session.notes || 'Sessão de estudo migrada',
-    completed: session.completed || false,
-    priority: session.quality || 0,
-    startDate: session.startTime,
-    dueDate: session.endTime,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    completedAt: session.completed ? session.endTime : undefined
-  }));
+  const tasks: Omit<Task, 'id'>[] = sqliteData.studySessions.map((session, index) => {
+    // Map performance to numeric priority
+    const getPerformancePriority = (performance?: string): number => {
+      switch (performance) {
+        case 'high': return 8;
+        case 'medium': return 5;
+        case 'low': return 2;
+        default: return 5;
+      }
+    };
+
+    return {
+      stageId: `stage-0-0`, // Default to first stage
+      journeyId: '1', // Default to first journey
+      title: `Sessão de Estudo ${index + 1}`,
+      description: session.notes || 'Sessão de estudo migrada',
+      completed: session.completed || false,
+      priority: getPerformancePriority(session.performance),
+      startDate: session.startTime ? new Date(session.startTime).toISOString() : undefined,
+      dueDate: session.endTime ? new Date(session.endTime).toISOString() : undefined,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      completedAt: session.completed && session.endTime ? new Date(session.endTime).toISOString() : undefined
+    };
+  });
 
   // Transform HeroAttributes from performance data
   const heroAttributes: Omit<HeroAttribute, 'id'>[] = [];
