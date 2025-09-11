@@ -48,7 +48,7 @@ const HierarchicalTopicSelector: React.FC<HierarchicalTopicSelectorProps> = ({
           {subjects.map(subject => (
             <div key={subject.id} className="border rounded-lg overflow-hidden">
               <div 
-                className="flex items-center justify-between p-3 bg-study-secondary/10 cursor-pointer hover:bg-study-secondary/20 transition-colors"
+                className="flex items-center justify-between p-3 bg-secondary/10 cursor-pointer hover:bg-secondary/20 transition-colors"
                 onClick={() => toggleSubject(subject.name)}
               >
                 <div className="flex items-center space-x-3">
@@ -85,9 +85,9 @@ const HierarchicalTopicSelector: React.FC<HierarchicalTopicSelectorProps> = ({
               {expandedSubjects.has(subject.name) && subject.topics && (
                 <div className="p-3 space-y-2">
                   {subject.topics.map(topic => (
-                    <div key={topic.id} className="border-l-2 border-study-primary/30 ml-2">
+                    <div key={topic.id} className="border-l-2 border-primary/30 ml-2">
                       <div 
-                        className="flex items-center justify-between p-2 pl-4 hover:bg-study-secondary/10 rounded cursor-pointer"
+                        className="flex items-center justify-between p-2 pl-4 hover:bg-secondary/10 rounded cursor-pointer"
                         onClick={() => toggleTopic(topic.id)}
                       >
                         <div className="flex items-center space-x-2">
@@ -100,7 +100,7 @@ const HierarchicalTopicSelector: React.FC<HierarchicalTopicSelectorProps> = ({
                           )}
                           <span className="text-sm font-medium">{topic.name}</span>
                           {topic.completed && (
-                            <Badge variant="outline" className="text-xs bg-green-100 text-green-800">
+                            <Badge variant="outline" className="text-xs bg-green-500/10 text-green-700 dark:text-green-400">
                               ✓ Completo
                             </Badge>
                           )}
@@ -124,13 +124,13 @@ const HierarchicalTopicSelector: React.FC<HierarchicalTopicSelectorProps> = ({
                           {topic.subtopics.map(subtopic => (
                             <div 
                               key={subtopic.id}
-                              className="flex items-center justify-between p-2 hover:bg-study-secondary/10 rounded"
+                              className="flex items-center justify-between p-2 hover:bg-secondary/10 rounded"
                             >
                               <div className="flex items-center space-x-2">
                                 <span className="text-sm text-muted-foreground">•</span>
                                 <span className="text-sm">{subtopic.name}</span>
                                 {subtopic.completed && (
-                                  <Badge variant="outline" className="text-xs bg-green-100 text-green-800">
+                                  <Badge variant="outline" className="text-xs bg-green-500/10 text-green-700 dark:text-green-400">
                                     ✓
                                   </Badge>
                                 )}
