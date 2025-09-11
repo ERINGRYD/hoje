@@ -11,12 +11,14 @@ import TimerSettings from '@/components/study/TimerSettings';
 import SaveStudySessionModal from '@/components/study/SaveStudySessionModal';
 import { StudySubject, StudySession, PomodoroSettings } from '@/types/study';
 import { useStudyContext } from '@/contexts/StudyContext';
-import { loadTypedSetting, saveTypedSetting } from '@/utils/sqlitePersistence';
+import { loadTypedSetting, saveTypedSetting, saveStudySessionData } from '@/utils/sqlitePersistence';
+import { useToast } from '@/hooks/use-toast';
 
 
 const StudySessionPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { toast } = useToast();
   const {
     studySessions,
     setStudySessions,
@@ -289,8 +291,52 @@ const handleCancelSettings = () => {
   setShowSettings(false);
 };
 
-const handleSaveSessionFromModal = (finalSession: StudySession) => {
-  setStudySessions(prev => [...prev, finalSession]);
+const handleSaveSessionFromModal = async (finalSession: StudySession) => {
+  console.log('💾 Saving study session:', finalSession);
+  
+  try {
+    // Save to localStorage as backup first
+    const backupKey = `study_session_backup_${finalSession.id}`;
+    localStorage.setItem(backupKey, JSON.stringify(finalSession));
+    console.log('📦 Session backed up to localStorage:', backupKey);
+
+    // Save to database
+    saveStudySessionData(finalSession);
+    console.log('✅ Session saved to database successfully');
+
+    // Update context state
+    setStudySessions(prev => {
+      const newSessions = [...prev, finalSession];
+      console.log('📊 Updated session count:', newSessions.length);
+      return newSessions;
+    });
+
+    // Show success toast
+    toast({
+      title: "Sessão salva com sucesso!",
+      description: `Duração: ${finalSession.duration} min | ${finalSession.subject}${finalSession.topic ? ` / ${finalSession.topic}` : ''}`,
+    });
+
+    // Clean up backup after successful save
+    setTimeout(() => {
+      localStorage.removeItem(backupKey);
+      console.log('🧹 Backup cleaned up:', backupKey);
+    }, 5000);
+
+  } catch (error) {
+    console.error('❌ Error saving study session:', error);
+    
+    // Show error toast
+    toast({
+      title: "Erro ao salvar sessão",
+      description: "A sessão foi salva localmente e será sincronizada quando possível.",
+      variant: "destructive",
+    });
+
+    // Still update context even if DB save failed
+    setStudySessions(prev => [...prev, finalSession]);
+  }
+  
   setShowSaveModal(false);
   setPendingSession(null);
   setPendingNetSeconds(0);

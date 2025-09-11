@@ -97,13 +97,23 @@ export const StudyProvider: React.FC<StudyProviderProps> = ({ children }) => {
   // Auto-save study sessions when they change (only if database is ready)
   useEffect(() => {
     if (studySessions.length > 0 && isInitialized) {
-      // Save the most recent session (the one just added)
       const latestSession = studySessions[studySessions.length - 1];
-      if (latestSession) {
-        try {
-          saveStudySession(latestSession);
-        } catch (error) {
-          console.error('Error saving study session:', error);
+      if (latestSession && latestSession.id) {
+        console.log('🔄 StudyContext auto-save triggered for session:', latestSession.id);
+        
+        // Check if this session was already saved (avoid duplicate saves)
+        const existingSessions = loadStudySessions();
+        const alreadyExists = existingSessions.some(s => s.id === latestSession.id);
+        
+        if (!alreadyExists) {
+          try {
+            saveStudySession(latestSession);
+            console.log('✅ StudyContext auto-save successful for session:', latestSession.id);
+          } catch (error) {
+            console.error('❌ StudyContext auto-save failed for session:', latestSession.id, error);
+          }
+        } else {
+          console.log('⏭️ Session already exists, skipping auto-save:', latestSession.id);
         }
       }
     }
