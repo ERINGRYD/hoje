@@ -119,6 +119,25 @@ export const StudyProvider: React.FC<StudyProviderProps> = ({ children }) => {
     }
   }, [studySessions, isInitialized]);
 
+  // Debug listener for testing topic selection
+  useEffect(() => {
+    const handleDebugRequest = () => {
+      console.log('📋 StudyContext Debug Info:');
+      console.log('📊 Subjects:', subjects.length);
+      subjects.forEach((subject, i) => {
+        console.log(`  ${i+1}. ${subject.name} (${subject.topics?.length || 0} topics)`);
+        subject.topics?.forEach((topic, j) => {
+          console.log(`    ${j+1}. ${topic.name} ${topic.subtopics?.length ? `(${topic.subtopics.length} subtopics)` : ''}`);
+        });
+      });
+      console.log('🎯 Study Plan:', studyPlan ? 'Available' : 'Not available');
+      console.log('💾 Database Ready:', isInitialized);
+    };
+
+    window.addEventListener('debugGetStudyContext', handleDebugRequest);
+    return () => window.removeEventListener('debugGetStudyContext', handleDebugRequest);
+  }, [subjects, studyPlan, isInitialized]);
+
   const examTypes: ExamType[] = [
     { 
       id: 'enem', 

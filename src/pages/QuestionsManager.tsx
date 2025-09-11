@@ -185,7 +185,7 @@ export default function QuestionsManager() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-                <Target className="h-8 w-8 text-study-primary" />
+                <Target className="h-8 w-8 text-primary" />
                 Gestão de Questões
               </h1>
               <p className="text-muted-foreground mt-1">
@@ -213,8 +213,8 @@ export default function QuestionsManager() {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-study-primary/10 rounded-lg">
-                    <BookOpen className="h-6 w-6 text-study-primary" />
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <BookOpen className="h-6 w-6 text-primary" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-foreground">{stats.totalTopics}</p>
@@ -227,8 +227,8 @@ export default function QuestionsManager() {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-study-danger/10 rounded-lg">
-                    <AlertTriangle className="h-6 w-6 text-study-danger" />
+                  <div className="p-2 bg-destructive/10 rounded-lg">
+                    <AlertTriangle className="h-6 w-6 text-destructive" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-foreground">{stats.totalEnemies}</p>
@@ -241,8 +241,8 @@ export default function QuestionsManager() {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-study-success/10 rounded-lg">
-                    <FileText className="h-6 w-6 text-study-success" />
+                  <div className="p-2 bg-green-500/10 rounded-lg">
+                    <FileText className="h-6 w-6 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-foreground">{stats.totalQuestions}</p>
@@ -255,8 +255,8 @@ export default function QuestionsManager() {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-study-accent/10 rounded-lg">
-                    <Users className="h-6 w-6 text-study-accent" />
+                  <div className="p-2 bg-accent/10 rounded-lg">
+                    <Users className="h-6 w-6 text-accent-foreground" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-foreground">{subjects.length}</p>

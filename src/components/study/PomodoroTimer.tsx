@@ -62,7 +62,7 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
                 </div> : <div className="flex flex-wrap justify-center gap-4">
                   {isTimerRunning ? <Button onClick={onPauseTimer} size="lg" variant="outline">
                       ⏸️ Pausar
-                    </Button> : <Button onClick={onResumeTimer} size="lg" className="bg-study-primary hover:bg-study-primary/90">
+                    </Button> : <Button onClick={onResumeTimer} size="lg" className="bg-primary hover:bg-primary/90">
                       ▶️ Continuar
                     </Button>}
                   <Button onClick={onStopTimer} size="lg" variant="destructive">
