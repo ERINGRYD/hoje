@@ -103,8 +103,8 @@ const BottomNavigation = () => {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border">
-      <div className="max-w-6xl mx-auto px-2">
-        <div className="flex items-center gap-1 py-2 overflow-x-auto scrollbar-hide">
+      <div className="max-w-6xl mx-auto px-4">
+        <div className="flex items-center justify-around py-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item);
@@ -115,11 +115,11 @@ const BottomNavigation = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => handleNavigation(item)}
-                className={`flex flex-col items-center space-y-1 px-2 py-2 h-auto min-w-[60px] flex-shrink-0 ${
+                className={`flex flex-col items-center space-y-1 px-3 py-2 h-auto min-w-0 ${
                   active 
-                    ? 'text-primary bg-primary/10' 
+                    ? 'text-study-primary bg-study-primary/10' 
                     : item.isHighlighted 
-                      ? 'text-primary hover:text-primary hover:bg-primary/10' 
+                      ? 'text-study-accent hover:text-study-accent hover:bg-study-accent/10' 
                       : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
