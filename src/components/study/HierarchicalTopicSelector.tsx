@@ -11,10 +11,29 @@ interface HierarchicalTopicSelectorProps {
   onStartSession: (subject: string, topic?: string, subtopic?: string) => void;
 }
 
-const HierarchicalTopicSelector: React.FC<HierarchicalTopicSelectorProps> = ({
-  subjects,
-  onStartSession
+const HierarchicalTopicSelector: React.FC<HierarchicalTopicSelectorProps> = ({ 
+  subjects, 
+  onStartSession 
 }) => {
+  // Debug logging
+  console.log('🎯 HierarchicalTopicSelector - subjects received:', subjects?.length || 0);
+  
+  // Early return if no subjects
+  if (!subjects || subjects.length === 0) {
+    return (
+      <Card className="p-6">
+        <div className="text-center py-8">
+          <h3 className="text-lg font-medium mb-2">Nenhum tema disponível</h3>
+          <p className="text-muted-foreground mb-4">
+            Você precisa criar um plano de estudos primeiro para ter temas disponíveis.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Vá para a aba "Planejador" para criar seu plano de estudos.
+          </p>
+        </div>
+      </Card>
+    );
+  }
   const [expandedSubjects, setExpandedSubjects] = useState<Set<string>>(new Set());
   const [expandedTopics, setExpandedTopics] = useState<Set<string>>(new Set());
 

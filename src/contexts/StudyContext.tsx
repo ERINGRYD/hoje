@@ -70,6 +70,13 @@ export const StudyProvider: React.FC<StudyProviderProps> = ({ children }) => {
             ? savedPlan
             : { ...savedPlan, cycleStart: new Date() };
           setStudyPlan(planWithDefaults);
+          
+          // CRITICAL FIX: Sync subjects from study plan
+          if (planWithDefaults.subjects && planWithDefaults.subjects.length > 0) {
+            console.log('🔄 Sincronizando subjects do plano:', planWithDefaults.subjects.length);
+            setSubjects(planWithDefaults.subjects);
+          }
+          
           if (planWithDefaults.examDate) {
             setExamDate(new Date(planWithDefaults.examDate));
           }
@@ -86,6 +93,25 @@ export const StudyProvider: React.FC<StudyProviderProps> = ({ children }) => {
 
     initializeApp();
   }, [isInitialized]);
+
+  // Sync subjects when studyPlan changes (CRITICAL FIX)
+  useEffect(() => {
+    if (studyPlan?.subjects && studyPlan.subjects.length > 0 && subjects.length === 0) {
+      console.log('🔄 Sincronizando subjects automaticamente:', studyPlan.subjects.length);
+      setSubjects(studyPlan.subjects);
+    }
+  }, [studyPlan, subjects.length]);
+
+  // Sync studyPlan.subjects when subjects change
+  useEffect(() => {
+    if (subjects.length > 0 && studyPlan && isInitialized) {
+      const updatedPlan = { ...studyPlan, subjects };
+      if (JSON.stringify(studyPlan.subjects) !== JSON.stringify(subjects)) {
+        console.log('🔄 Atualizando subjects no plano de estudos');
+        setStudyPlan(updatedPlan);
+      }
+    }
+  }, [subjects, studyPlan?.id, isInitialized]);
 
   // Auto-save study plan when it changes (only if database is ready)
   useEffect(() => {
@@ -130,12 +156,28 @@ export const StudyProvider: React.FC<StudyProviderProps> = ({ children }) => {
           console.log(`    ${j+1}. ${topic.name} ${topic.subtopics?.length ? `(${topic.subtopics.length} subtopics)` : ''}`);
         });
       });
-      console.log('🎯 Study Plan:', studyPlan ? 'Available' : 'Not available');
+      console.log('🎯 Study Plan:', studyPlan ? `Available (ID: ${studyPlan.id})` : 'Not available');
+      console.log('🎯 Study Plan Subjects:', studyPlan?.subjects?.length || 0);
       console.log('💾 Database Ready:', isInitialized);
     };
 
+    const handleForceSyncSubjects = () => {
+      console.log('🔄 Force sync subjects requested...');
+      if (studyPlan?.subjects && studyPlan.subjects.length > 0) {
+        console.log('🔄 Syncing subjects from study plan:', studyPlan.subjects.length);
+        setSubjects(studyPlan.subjects);
+      } else {
+        console.log('⚠️ No subjects in study plan to sync');
+      }
+    };
+
     window.addEventListener('debugGetStudyContext', handleDebugRequest);
-    return () => window.removeEventListener('debugGetStudyContext', handleDebugRequest);
+    window.addEventListener('forceSyncSubjects', handleForceSyncSubjects);
+    
+    return () => {
+      window.removeEventListener('debugGetStudyContext', handleDebugRequest);
+      window.removeEventListener('forceSyncSubjects', handleForceSyncSubjects);
+    };
   }, [subjects, studyPlan, isInitialized]);
 
   const examTypes: ExamType[] = [

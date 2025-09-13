@@ -104,6 +104,21 @@ export const testTopicSelection = () => {
   }
 };
 
+// Function to force subjects sync from study plan
+export const forceSyncSubjects = () => {
+  console.log('🔄 Forcing subjects sync from study plan...');
+  
+  try {
+    const syncEvent = new CustomEvent('forceSyncSubjects');
+    window.dispatchEvent(syncEvent);
+    console.log('✅ Sync event dispatched');
+    return true;
+  } catch (error) {
+    console.error('❌ Failed to force sync:', error);
+    return false;
+  }
+};
+
 // Main debug function
 export const runFullDebugTest = async () => {
   console.log('🚀 Running full debug test suite...');
@@ -125,7 +140,8 @@ if (typeof window !== 'undefined') {
     testStudySessionPersistence,
     testBackupSystem,
     testTopicSelection,
-    runFullDebugTest
+    runFullDebugTest,
+    forceSyncSubjects
   };
   
   console.log('🔧 Debug functions available: window.debugTests');
@@ -133,4 +149,5 @@ if (typeof window !== 'undefined') {
   console.log('  - testBackupSystem()');
   console.log('  - testTopicSelection()');
   console.log('  - runFullDebugTest()');
+  console.log('  - forceSyncSubjects()');
 }
