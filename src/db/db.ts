@@ -485,6 +485,50 @@ export const exportDatabase = (): Blob => {
 
 // Import functionality removed - handled by DBProvider context
 
+// Clear all data from database
+export const clearAllData = (): boolean => {
+  try {
+    const database = getDB();
+    
+    // List of all tables to clear (in order to respect foreign key constraints)
+    const tablesToClear = [
+      'question_attempts',
+      'battle_sessions', 
+      'enemy_reviews',
+      'flashcards',
+      'questions',
+      'performance_metrics',
+      'study_goals',
+      'app_settings',
+      'daily_logs',
+      'saved_plans',
+      'study_sessions',
+      'study_subtopics',
+      'study_topics', 
+      'study_subjects',
+      'study_plans',
+      'user_progress'
+    ];
+
+    // Clear all tables
+    for (const table of tablesToClear) {
+      try {
+        database.run(`DELETE FROM ${table}`);
+        console.log(`✅ Cleared table: ${table}`);
+      } catch (error) {
+        console.warn(`⚠️  Warning clearing table ${table}:`, error);
+        // Continue clearing other tables even if one fails
+      }
+    }
+
+    console.log('🗑️  All data cleared successfully');
+    return true;
+  } catch (error) {
+    console.error('❌ Error clearing all data:', error);
+    return false;
+  }
+};
+
 // Database utilities for viewer
 export const getAllTables = (): string[] => {
   const database = getDB();

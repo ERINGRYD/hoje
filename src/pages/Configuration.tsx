@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, BookOpen, FolderOpen, Settings2, Brain } from 'lucide-react';
+import { ArrowLeft, BookOpen, FolderOpen, Settings2, Brain, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CycleConfiguration from '@/components/study/CycleConfiguration';
 import StudyPlanManager from '@/components/study/StudyPlanManager';
@@ -12,6 +12,7 @@ import ReviewStatsWidget from '@/components/study/ReviewStatsWidget';
 import { useStudyContext } from '@/contexts/StudyContext';
 import { StudyPlan } from '@/types/study';
 import { migrateReviewSystem } from '@/db/migration-review-system';
+import { clearAllData } from '@/db/db';
 import { toast } from '@/hooks/use-toast';
 
 const Configuration = () => {
@@ -49,6 +50,58 @@ const Configuration = () => {
   const handleRegenerateCycle = () => {
     // Implementar lógica de regeneração se necessário
     console.log('Regenerating cycle...');
+  };
+
+  const handleClearAllData = async () => {
+    const confirmed = confirm(
+      'ATENÇÃO: Esta ação irá apagar TODOS os dados do aplicativo incluindo:\n\n' +
+      '• Todos os planos de estudo\n' +
+      '• Todas as sessões de estudo\n' +
+      '• Todas as questões e flashcards\n' +
+      '• Todo o progresso no sistema de batalhas\n' +
+      '• Todas as configurações personalizadas\n' +
+      '• Todos os dados de performance\n\n' +
+      'Esta ação NÃO PODE ser desfeita.\n\n' +
+      'Tem certeza que deseja continuar?'
+    );
+    
+    if (confirmed) {
+      const secondConfirmation = confirm(
+        'ÚLTIMA CONFIRMAÇÃO:\n\n' +
+        'Você está prestes a APAGAR TODOS OS DADOS.\n' +
+        'Certifique-se de ter feito backup se necessário.\n\n' +
+        'Continuar com a exclusão?'
+      );
+      
+      if (secondConfirmation) {
+        try {
+          const success = clearAllData();
+          if (success) {
+            toast({
+              title: "Dados Removidos",
+              description: "Todos os dados foram apagados com sucesso. A página será recarregada.",
+            });
+            // Reload page after clearing data
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+          } else {
+            toast({
+              title: "Erro",
+              description: "Não foi possível apagar todos os dados. Verifique o console para mais detalhes.",
+              variant: "destructive"
+            });
+          }
+        } catch (error) {
+          console.error('Error clearing data:', error);
+          toast({
+            title: "Erro",
+            description: "Ocorreu um erro ao tentar apagar os dados.",
+            variant: "destructive"
+          });
+        }
+      }
+    }
   };
 
   if (!studyPlan) {
@@ -132,6 +185,16 @@ const Configuration = () => {
                   onPlanLoaded={handleUpdatePlan}
                   onPlanSaved={(planId) => console.log('Plan saved:', planId)}
                 />
+                
+                <Button 
+                  variant="destructive" 
+                  size="sm" 
+                  onClick={handleClearAllData}
+                  className="flex items-center gap-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Apagar Todos os Dados
+                </Button>
               </div>
               
               <PlanAdjustmentModal 
