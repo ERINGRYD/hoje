@@ -94,13 +94,30 @@ export const StudyProvider: React.FC<StudyProviderProps> = ({ children }) => {
     initializeApp();
   }, [isInitialized]);
 
-  // Sync subjects when studyPlan changes (CRITICAL FIX)
+  // CRITICAL: Enhanced sync subjects when studyPlan changes
   useEffect(() => {
-    if (studyPlan?.subjects && studyPlan.subjects.length > 0 && subjects.length === 0) {
-      console.log('🔄 Sincronizando subjects automaticamente:', studyPlan.subjects.length);
-      setSubjects(studyPlan.subjects);
+    if (studyPlan?.subjects && studyPlan.subjects.length > 0) {
+      // Always sync if subjects are empty OR if studyPlan subjects changed
+      const shouldSync = subjects.length === 0 || 
+        JSON.stringify(studyPlan.subjects) !== JSON.stringify(subjects);
+      
+      if (shouldSync) {
+        console.log('🔄 StudyContext: Syncing subjects from studyPlan', {
+          planSubjects: studyPlan.subjects.length,
+          currentSubjects: subjects.length,
+          planId: studyPlan.id
+        });
+        setSubjects(studyPlan.subjects);
+      }
+    } else if (studyPlan && (!studyPlan.subjects || studyPlan.subjects.length === 0)) {
+      console.warn('⚠️ StudyContext: StudyPlan loaded but has no subjects', {
+        planId: studyPlan.id,
+        hasSubjects: !!studyPlan.subjects,
+        subjectCount: studyPlan.subjects?.length || 0
+      });
+      setSubjects([]);
     }
-  }, [studyPlan, subjects.length]);
+  }, [studyPlan]);
 
   // Sync studyPlan.subjects when subjects change
   useEffect(() => {

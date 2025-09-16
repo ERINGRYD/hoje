@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronRight, ChevronDown, Play } from 'lucide-react';
+import { ChevronRight, ChevronDown, Play, BookOpen, RefreshCw } from 'lucide-react';
 import { StudySubject } from '@/types/study';
 
 interface HierarchicalTopicSelectorProps {
@@ -15,27 +15,51 @@ const HierarchicalTopicSelector: React.FC<HierarchicalTopicSelectorProps> = ({
   subjects, 
   onStartSession 
 }) => {
-  // Debug logging
-  console.log('🎯 HierarchicalTopicSelector - subjects received:', subjects?.length || 0);
+  // Enhanced debug logging
+  console.log('🎯 HierarchicalTopicSelector: Rendering with subjects:', {
+    subjectCount: subjects?.length || 0,
+    subjects: subjects?.map(s => ({ 
+      name: s.name, 
+      topics: s.topics?.length || 0,
+      id: s.id 
+    })) || [],
+    timestamp: new Date().toISOString()
+  });
   
-  // Early return if no subjects
+  const [expandedSubjects, setExpandedSubjects] = useState<Set<string>>(new Set());
+  const [expandedTopics, setExpandedTopics] = useState<Set<string>>(new Set());
+  
+  // Enhanced fallback for no subjects
   if (!subjects || subjects.length === 0) {
     return (
       <Card className="p-6">
-        <div className="text-center py-8">
-          <h3 className="text-lg font-medium mb-2">Nenhum tema disponível</h3>
-          <p className="text-muted-foreground mb-4">
-            Você precisa criar um plano de estudos primeiro para ter temas disponíveis.
+        <div className="text-center text-muted-foreground">
+          <BookOpen className="mx-auto mb-4 h-12 w-12 text-muted-foreground/50" />
+          <h3 className="text-lg font-semibold mb-2">Nenhum tema disponível</h3>
+          <p className="text-sm mb-4 max-w-md mx-auto">
+            Configure seu plano de estudos primeiro para ver os temas disponíveis para estudo.
           </p>
-          <p className="text-sm text-muted-foreground">
-            Vá para a aba "Planejador" para criar seu plano de estudos.
-          </p>
+          <div className="space-y-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex items-center gap-2"
+              onClick={() => {
+                console.log('🔄 HierarchicalTopicSelector: Force refresh requested');
+                window.dispatchEvent(new CustomEvent('forceSyncSubjects'));
+              }}
+            >
+              <RefreshCw className="h-4 w-4" />
+              Recarregar Temas
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              Ou vá para a aba "Planejador" para criar um plano de estudos
+            </p>
+          </div>
         </div>
       </Card>
     );
   }
-  const [expandedSubjects, setExpandedSubjects] = useState<Set<string>>(new Set());
-  const [expandedTopics, setExpandedTopics] = useState<Set<string>>(new Set());
 
   const toggleSubject = (subjectName: string) => {
     const newExpanded = new Set(expandedSubjects);

@@ -5,6 +5,7 @@ import { ArrowLeft, BookOpen, FolderOpen, Settings2, Brain, Trash2 } from 'lucid
 import { useNavigate } from 'react-router-dom';
 import CycleConfiguration from '@/components/study/CycleConfiguration';
 import StudyPlanManager from '@/components/study/StudyPlanManager';
+import StudyDataRecovery from '@/components/study/StudyDataRecovery';
 import PlanAdjustmentModal from '@/components/study/PlanAdjustmentModal';
 import SubjectTopicManager from '@/components/study/SubjectTopicManager';
 import ReviewSettingsModal from '@/components/study/ReviewSettingsModal';
@@ -224,6 +225,9 @@ const Configuration = () => {
               </CardContent>
             </Card>
           )}
+          
+          {/* Data Recovery and Debugging Section */}
+          <StudyDataRecovery />
         </div>
       </div>
     </div>

@@ -7,6 +7,7 @@ import { ArrowLeft, Settings } from 'lucide-react';
 import PomodoroTimer from '@/components/study/PomodoroTimer';
 import StudySessionHistory from '@/components/study/StudySessionHistory';
 import StudyStatistics from '@/components/study/StudyStatistics';
+import StudyContextStatus from '@/components/study/StudyContextStatus';
 import TimerSettings from '@/components/study/TimerSettings';
 import SaveStudySessionModal from '@/components/study/SaveStudySessionModal';
 import { StudySubject, StudySession, PomodoroSettings } from '@/types/study';
@@ -439,10 +440,22 @@ const handleCloseSaveModal = () => {
   />
 )}
 
-{studySessions.length > 0 && (
-            <div className="grid md:grid-cols-2 gap-6">
-              <StudySessionHistory studySessions={studySessions} />
-              <StudyStatistics studySessions={studySessions} />
+          {studySessions.length > 0 && (
+            <div className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <StudySessionHistory studySessions={studySessions} />
+                <StudyStatistics studySessions={studySessions} />
+              </div>
+              
+              {/* Debug status component - helpful for troubleshooting */}
+              <StudyContextStatus />
+            </div>
+          )}
+          
+          {/* Show debug status even when no sessions, for troubleshooting */}
+          {studySessions.length === 0 && subjects.length === 0 && (
+            <div className="mt-6">
+              <StudyContextStatus />
             </div>
           )}
         </div>

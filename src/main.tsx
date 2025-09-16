@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
+import './utils/studyContextDebug'
 import './utils/studySessionPersistenceTest.ts'
 import './utils/debugTestSuite'
 
